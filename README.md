@@ -64,21 +64,23 @@ Basically, Bugbot currently uses an exitCode 0 if Electron works or non-zero val
 This lets Bugbot see what releases are affected by the bug by checking your test against different Operating Systems and Electron versions. Some features of Bugbot will be modified and integrated in the standalone Issue tracker Bot to make it more powerful and robust. 
  
 2) Add automated responses under certain conditions:
-a reporter is missing a reproduction gist
+ 
+ - a reporter is missing a reproduction gist
  
 To send automated responses using an Action Bot the first thing we require is to be informed when the Issue is created. So we will ask GitHub to alert us when this happens. GitHub alerts us via a webhook. The webhook is triggered by the issue being created and then makes a request to a Nodejs function, which we can define, passing along the payload of the issue that was created. Refer to the Figure for the flowchart of the entire process.
- 
 
+<img src = "https://user-images.githubusercontent.com/46704901/194745145-b562cad5-a755-4715-9d3f-c71181733fac.jpg" width="400">
  
 We will create a Nodejs function that accepts the webhooks request and inspects its payload. We will parse out the creator and other details in the payload and format a response to the issue. Now that we have the data we need to create the comment on the issue, we need a way to talk back to the same issue and create the comment. Then we will call the GitHub API to create a comment on the issue, using a token that allows the function to make the call.
 So, while parsing the payload data we will check if the reporter has provided a reproduction gist alongwith a test case report and if the data is not present then we will call the Github API to provide a comment in the issue telling “a reproduction gist is missing, Kindly review the issue”. Also, to be extra cautious we will label the issue as blocked/need-repro until and unless the reporter provides a reproduction gist with a pass/fail test necessary for input to BugBot testing
-remind reporter if an issue is "blocked/needs-repro" for more than 60 days
+
+  - remind reporter if an issue is "blocked/needs-repro" for more than 60 days
  
 We will first set a parameter for idle number of days or inactivity as 60 days before sending an automated response from the Bot reminding them of the blocked/needs-repro issue. Using the payload data we can check the Github Issue field (updated_at) and if the last update is older than the idle number of days i.e. more than 60 days then we will generate an automated response sending a comment in the Issue reminding the reporter that “the issue is under blocked/needs-repro for more than 60 days and needs immediate attention from the user”. Also any updates made, or any comments added to the issues will restart the counter of days before sending another automated message after 60 more days or eventually leading to closing the Issue if left unattended for {x} number of days.
  
 3) Automatically close issues:
-for versions of Electron older than the supported versions
-if an issue has been marked “blocked” for more than {x} days
+  - for versions of Electron older than the supported versions
+  - if an issue has been marked “blocked” for more than {x} days
  
 Here we will specify two special parameters:-
  
